@@ -8,7 +8,7 @@ import { useDebouncedCallback } from "use-debounce";
 import SearchBox from "@/components/SearchBox/SearchBox";
 import css from "./Notes.client.module.css";
 import Pagination from "@/components/Pagination/Pagination";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 interface NotesClientProps {
   tag?: string;
@@ -17,17 +17,12 @@ interface NotesClientProps {
 const NotesClient = ({ tag }: NotesClientProps) => {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
-  const router = useRouter();
   const { data: notesData } = useQuery({
     queryKey: ["notes", page, search, tag],
     queryFn: () => fetchNotes(page, search, tag),
     placeholderData: keepPreviousData,
     refetchOnMount: false,
   });
-
-  const handleButtonClick = () => {
-    router.push("/notes/action/create");
-  };
 
   const handleChange = useDebouncedCallback((search: string) => {
     setSearch(search);
@@ -45,9 +40,9 @@ const NotesClient = ({ tag }: NotesClientProps) => {
             setPage={setPage}
           />
         )}
-        <button onClick={handleButtonClick} className={css.button}>
+        <Link href="/notes/action/create" className={css.button}>
           Create note +
-        </button>
+        </Link>
       </header>
       {notesData && notesData.notes.length > 0 && (
         <NoteList notes={notesData.notes} />
