@@ -1,12 +1,6 @@
-import axios from "axios";
 import type {Note, NewNote, FetchNotesResponse} from "../../types/note"
 import { api } from "./api";
 import { User } from "@/types/user";
-
-
-const API_KEY = process.env.NEXT_PUBLIC_NOTEHUB_TOKEN;
-
-
 
 
 export const fetchNotes = async( page:number, search?:string, tag?:string ):Promise<FetchNotesResponse> => {
