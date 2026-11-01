@@ -1,11 +1,9 @@
-// proxy.ts
-
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { parseSetCookie } from 'cookie';
 import { checkSession } from './lib/api/serverApi';
 
-const privateRoutes = ['/profile','/notes/:path*'];
+const privateRoutes = ['/profile', '/notes'];
 const publicRoutes = ['/sign-in', '/sign-up'];
 
 export async function proxy(request: NextRequest) {
@@ -25,11 +23,18 @@ export async function proxy(request: NextRequest) {
       if (setCookie) {
         const cookieArray = Array.isArray(setCookie) ? setCookie : [setCookie];
         for (const cookieStr of cookieArray) {
-		  const parsed = parseSetCookie(cookieStr);
+          const parsed = parseSetCookie(cookieStr);
             
           if (parsed.value) {
-			cookieStore.set(parsed.name, parsed.value, parsed);
-		  }          
+            const { name, value, ...cookieOptions } = parsed;
+            
+            const options = {
+              ...cookieOptions,
+              expires: cookieOptions.expires ? new Date(cookieOptions.expires) : undefined,
+            };
+
+            cookieStore.set(name, value, options);
+          }          
         }
         if (isPublicRoute) {
           return NextResponse.redirect(new URL('/', request.url), {
